@@ -12,10 +12,10 @@ export class Database {
   }
 
 
-  async useTable<T extends Schema>({sheetId, type}: {sheetId: number, type: T}): Promise<Table<T>>;
-  async useTable<T extends Schema>({sheetName, type}: {sheetName: string, type: T}): Promise<Table<T>>;
+  async useTable<T extends Schema>({sheetId, schema}: {sheetId: number, schema: T}): Promise<Table<T>>;
+  async useTable<T extends Schema>({sheetName, schema}: {sheetName: string, schema: T}): Promise<Table<T>>;
   
-  async useTable<T extends Schema>({sheetName, sheetId, type}: {sheetName?: string, sheetId?: number, type: T}): Promise<Table<T>> {
+  async useTable<T extends Schema>({sheetName, sheetId, schema}: {sheetName?: string, sheetId?: number, schema: T}): Promise<Table<T>> {
     if (!this._initialized)
       await this._spreadsheet.loadInfo();
 
@@ -32,6 +32,6 @@ export class Database {
     if (!sheet)
       throw new Error("Sheet is not found.");
 
-    return new Table<T>(sheet, type);
+    return new Table<T>(sheet, schema);
   }
 }
