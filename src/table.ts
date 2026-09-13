@@ -56,16 +56,17 @@ export class Table<S extends Schema> {
   async filter(predicate: (value: Row<S>, index: number, array: Row<S>[]) => boolean | Promise<boolean>) {
     return (await this.getRows()).filter(predicate);
   }
-  async updateRow(id: number): Promise<void>;
+  async updateRow(id: number, value: InferSchemaPartial<S>): Promise<void>;
   async updateRow(target: InferSchemaPartial<S> & {id: number}): Promise<void>;
 
-  async updateRow(argument: InferSchemaPartial<S> & {id: number} | number) {
+  async updateRow(argument: InferSchemaPartial<S> & {id: number} | number, v?: InferSchemaPartial<S>) {
     const id = typeof argument == "number" ? argument : argument.id;
     const rows = await this.sheet.getRows();
     const row  = rows.find(r => r.get("id") == id);
 
     if (!row) throw new Error("Row: "+id+" is not found.");
 
+    const value = typeof argument == "number" ? v : argument;
 
     const shape = this.schema;
     for (const key of Object.keys(shape) as [keyof typeof shape]) {
