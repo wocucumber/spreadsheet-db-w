@@ -19,21 +19,18 @@ type InferValidation<T extends ValidationObject> = ( T extends ValidationObject<
 export type Schema = Record<string, ValidationObject>;
 
 export type InferSchema<T extends Schema> = {
-  [K in keyof T]: InferValidation<T[K]>
-}
+  [K in keyof T]: InferValidation<T[K]>;
+} & {
+  id: InferValidation<NumberValidation>
+};
 
 export type InferSchemaPartial<T extends Schema> = Partial<InferSchema<T>>;
 
-const schema = createSchema({
-  tanu: string("abc")
-});
-
-const value: InferSchema<typeof schema> = {
-  tanu: "abc"
-}
-
-export function createSchema<T extends Schema>(schema: T): T {
-  return schema;
+export function createSchema<T extends Schema>(schema: T): T & {id: NumberValidation} {
+  return {
+    ...schema,
+    id: new NumberValidation("id")
+  };
 }
 
 export class ValidationObject<T extends {nullable?: boolean} = {nullable: false}> {
