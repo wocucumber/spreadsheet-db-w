@@ -1,7 +1,3 @@
-export interface SpreadsheetDbWSchema {
-  [key: string]: ValidationObject
-}
-
 type NullValue = undefined | null;
 
 type InferValidation<T extends ValidationObject> = ( T extends ValidationObject<infer Option> ?
