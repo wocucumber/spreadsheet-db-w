@@ -14,9 +14,6 @@ importers:
       google-spreadsheet:
         specifier: ^5.3.0
         version: 5.3.0(google-auth-library@11.0.2)
-      zod:
-        specifier: ^4.6.2
-        version: 4.6.2
     devDependencies:
       typescript:
         specifier: ^7.0.2
@@ -252,9 +249,6 @@ packages:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
 
-  zod@4.6.2:
-    resolution: {integrity: sha512-lh5RCAGFa1Cm2hjtNwLQhSs/AsqdWnTQaBER9fEwN/88pSh7KOtJavtBx/0VlkN/uFd61SwYmljLMDAsHlvzBQ==}
-
 snapshots:
 
   '@typescript/typescript-aix-ppc64@7.0.2':
@@ -444,5 +438,3 @@ snapshots:
       '@typescript/typescript-win32-x64': 7.0.2
 
   web-streams-polyfill@3.3.3: {}
-
-  zod@4.6.2: {}

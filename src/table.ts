@@ -1,17 +1,17 @@
 import { GoogleSpreadsheetRow, GoogleSpreadsheetWorksheet } from "google-spreadsheet";
-import z, { ZodObject, type ZodRawShape } from "zod";
+import type { InferSchema, InferSchemaPartial, Schema } from "./schema";
 
-export type Row<TableType extends ZodObject<ZodRawShape>> = z.infer<TableType> & {
+export type Row<TableType extends Schema> = InferSchema<TableType> & {
   id: number;
   // rowId: number;
 };
 
-export class Table<ZodType extends ZodObject<ZodRawShape>> {
+export class Table<S extends Schema> {
   private sheet: GoogleSpreadsheetWorksheet;
-  public type: ZodType;
-  constructor(sheet: GoogleSpreadsheetWorksheet, type: ZodType) {
+  public schema: S;
+  constructor(sheet: GoogleSpreadsheetWorksheet, schema: S) {
     this.sheet = sheet;
-    this.type = type;
+    this.schema = schema;
   }
   private parseRow(r: GoogleSpreadsheetRow) {
     const id = r.get("id");
@@ -22,16 +22,16 @@ export class Table<ZodType extends ZodObject<ZodRawShape>> {
       // rowId: r.rowNumber
     };
 
-    const shape = this.type.shape
-    for (const key of Object.keys(shape)) {
+    const shape = this.schema;
+    for (const key of Object.keys(shape) as [keyof typeof shape]) {
       // @ts-ignore
-      row[key] = shape[key].parse(r.get(key));
+      row[key] = shape[key].__validate(r.get(this.schema[key].__key));
     }
 
     return row;
   }
-  async getRows(): Promise<Row<ZodType>[]> {
-    const rows: Row<ZodType>[] = [];
+  async getRows(): Promise<Row<S>[]> {
+    const rows: Row<S>[] = [];
 
     for (const r of await this.sheet.getRows()) {
       rows.push(this.parseRow(r));
@@ -43,7 +43,7 @@ export class Table<ZodType extends ZodObject<ZodRawShape>> {
     const rows = await this.getRows();
     return rows.find(r => r.id == id);
   }
-  async where(filter: z.infer<ReturnType<typeof this.type.partial>>) {
+  async where(filter: InferSchemaPartial<S>) {
     const rows = await this.getRows();
     const filterKeys = Object.keys(filter);
     return rows.filter(r => {
@@ -53,13 +53,13 @@ export class Table<ZodType extends ZodObject<ZodRawShape>> {
       return true;
     });
   }
-  async filter(predicate: (value: Row<ZodType>, index: number, array: Row<ZodType>[]) => boolean | Promise<boolean>) {
+  async filter(predicate: (value: Row<S>, index: number, array: Row<S>[]) => boolean | Promise<boolean>) {
     return (await this.getRows()).filter(predicate);
   }
   async updateRow(id: number): Promise<void>;
-  async updateRow(target: z.infer<ReturnType<typeof this.type.partial>> & {id: number}): Promise<void>;
+  async updateRow(target: InferSchemaPartial<S> & {id: number}): Promise<void>;
 
-  async updateRow(argument: z.infer<ReturnType<typeof this.type.partial>> & {id: number} | number) {
+  async updateRow(argument: InferSchemaPartial<S> & {id: number} | number) {
     const id = typeof argument == "number" ? argument : argument.id;
     const rows = await this.sheet.getRows();
     const row  = rows.find(r => r.get("id") == id);
@@ -67,27 +67,27 @@ export class Table<ZodType extends ZodObject<ZodRawShape>> {
     if (!row) throw new Error("Row: "+id+" is not found.");
 
 
-    const shape = this.type.shape;
-    for (const key of Object.keys(shape)) {
+    const shape = this.schema;
+    for (const key of Object.keys(shape) as [keyof typeof shape]) {
       // @ts-ignore
       if (key in value)
         // @ts-ignore
-        row.set(key, String(shape[key].parse(value[key])))
+        row.set(shape[key].__key, String(shape[key].__validate(value[key])))
       
     }
 
     await row.save();
   }
 
-  async appendRow(value: z.infer<ZodType>) {
+  async appendRow(value: S) {
     const rows = await this.sheet.getRows();
     const newId = rows.reduce((prev, curr) => Math.max(prev, Number(curr.get("id"))), 0) + 1;
 
     const parsed = {};
-    const shape = this.type.shape;
+    const shape = this.schema;
     for (const key of Object.keys(shape)) {
       // @ts-ignore
-      parsed[key] = String(shape[key].parse(value[key]));
+      parsed[key] = String(shape[key].__validate(value[key]));
     }
 
     const row = await this.sheet.addRow({
@@ -99,9 +99,9 @@ export class Table<ZodType extends ZodObject<ZodRawShape>> {
   }
 
   async deleteRow(id: number): Promise<void>;
-  async deleteRow(target: z.infer<ReturnType<typeof this.type.partial>> & {id: number}): Promise<void>;
+  async deleteRow(target: S & {id: number}): Promise<void>;
 
-  async deleteRow(argument: z.infer<ReturnType<typeof this.type.partial>> & {id: number} | number) {
+  async deleteRow(argument: S & {id: number} | number) {
     const id = typeof argument == "number" ? argument : argument.id;
 
     const rows = await this.sheet.getRows();

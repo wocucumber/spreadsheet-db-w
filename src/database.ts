@@ -1,7 +1,7 @@
 import { Authorication } from "./authorication";
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { Table } from "./table";
-import { ZodObject } from "zod";
+import { Table } from "./table";;
+import type { Schema } from "./schema";
 
 export class Database {
   private _spreadsheet: GoogleSpreadsheet;
@@ -12,10 +12,10 @@ export class Database {
   }
 
 
-  async useTable<T extends ZodObject>({sheetId, type}: {sheetId: number, type: T}): Promise<Table<T>>;
-  async useTable<T extends ZodObject>({sheetName, type}: {sheetName: string, type: T}): Promise<Table<T>>;
+  async useTable<T extends Schema>({sheetId, type}: {sheetId: number, type: T}): Promise<Table<T>>;
+  async useTable<T extends Schema>({sheetName, type}: {sheetName: string, type: T}): Promise<Table<T>>;
   
-  async useTable<T extends ZodObject>({sheetName, sheetId, type}: {sheetName?: string, sheetId?: number, type: T}): Promise<Table<T>> {
+  async useTable<T extends Schema>({sheetName, sheetId, type}: {sheetName?: string, sheetId?: number, type: T}): Promise<Table<T>> {
     if (!this._initialized)
       await this._spreadsheet.loadInfo();
 
