@@ -1,0 +1,25 @@
+{
+  "name": "spreadsheet-db-w",
+  "version": "1.0.0",
+  "description": "You can use spreadsheets as a convenient database.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [],
+  "author": "wocucumber",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "google-auth-library": "^11.0.2",
+    "google-spreadsheet": "^5.3.0",
+    "zod": "^4.6.2"
+  }
+}
