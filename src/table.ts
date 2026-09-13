@@ -1,5 +1,5 @@
 import { GoogleSpreadsheetRow, GoogleSpreadsheetWorksheet } from "google-spreadsheet";
-import type { InferSchema, InferSchemaPartial, Schema } from "./schema";
+import type { InferSchema, InferSchemaPartial, Schema } from "./schema.js";
 
 export type Row<TableType extends Schema> = InferSchema<TableType> & {
   id: number;

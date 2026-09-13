@@ -1,7 +1,7 @@
-import { Authorication } from "./authorication";
+import { Authorication } from "./authorication.js";
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { Table } from "./table";;
-import type { Schema } from "./schema";
+import { Table } from "./table.js";
+import type { Schema } from "./schema.js";
 
 export class Database {
   private _spreadsheet: GoogleSpreadsheet;
