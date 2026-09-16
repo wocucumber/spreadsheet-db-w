@@ -95,7 +95,7 @@ export class Table<S extends Schema> {
     const shape = this.schema;
     for (const key of Object.keys(shape)) {
       // @ts-ignore
-      parsed[key] = parseToString(shape[key].__validate(value[key]));
+      parsed[key] = key == "id" ? newId : parseToString(shape[key].__validate(value[key]));
     }
 
     const row = await this.sheet.addRow({
