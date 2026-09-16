@@ -87,7 +87,7 @@ export class Table<S extends Schema> {
     await row.save();
   }
 
-  async appendRow(value: Omit<S, "id">) {
+  async appendRow(value: Omit<InferSchema<S>, "id">) {
     const rows = await this.sheet.getRows();
     const newId = rows.reduce((prev, curr) => Math.max(prev, Number(curr.get("id"))), 0) + 1;
 
