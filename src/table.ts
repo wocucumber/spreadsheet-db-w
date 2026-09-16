@@ -6,6 +6,13 @@ export type Row<TableType extends Schema> = InferSchema<TableType> & {
   // rowId: number;
 };
 
+export const NULL_VALUE = "*;[<<null>];*";
+
+function parseToString(value: null | any): string {
+  if (value == null) return NULL_VALUE;
+  return value.toString();
+}
+
 export class Table<S extends Schema> {
   private sheet: GoogleSpreadsheetWorksheet;
   public schema: S;
@@ -73,7 +80,7 @@ export class Table<S extends Schema> {
       // @ts-ignore
       if (key in value)
         // @ts-ignore
-        row.set(shape[key].__key, String(shape[key].__validate(value[key])))
+        row.set(shape[key].__key, parseToString(shape[key].__validate(value[key])))
       
     }
 
@@ -88,7 +95,7 @@ export class Table<S extends Schema> {
     const shape = this.schema;
     for (const key of Object.keys(shape)) {
       // @ts-ignore
-      parsed[key] = String(shape[key].__validate(value[key]));
+      parsed[key] = parseToString(shape[key].__validate(value[key]));
     }
 
     const row = await this.sheet.addRow({

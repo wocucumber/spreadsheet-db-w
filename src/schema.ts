@@ -1,4 +1,6 @@
-type NullValue = undefined | null;
+import { NULL_VALUE } from "./table.js";
+
+type NullValue = null;
 
 type InferValidation<T extends ValidationObject> = ( T extends ValidationObject<infer Option> ?
 
@@ -30,7 +32,7 @@ export function createSchema<T extends Schema>(schema: T): T & {id: NumberValida
 }
 
 export class ValidationObject<T extends {nullable?: boolean} = {nullable: false}> {
-  private _nullable: boolean;
+  protected _nullable: boolean;
   private type: "string" | "number";
   private key: string;
 
@@ -60,8 +62,14 @@ export class StringValidation extends ValidationObject {
   constructor(key: string) {
     super(key, "string");
   }
-  override __validate(value: any): string {
+  override __validate(value: any): string | null {
     this.validateBase(value);
+    if (value == "" && this._nullable)
+      return null;
+
+    if (value == NULL_VALUE)
+      return null;
+
     return value.toString();
   }
 }
@@ -69,8 +77,15 @@ export class NumberValidation extends ValidationObject {
   constructor(key: string) {
     super(key, "number");
   }
-  override __validate(value: any): number {
+  override __validate(value: any): number | null {
     this.validateBase(value);
+
+    if (value == "" && this._nullable)
+      return null;
+
+    if (value == NULL_VALUE)
+      return null;
+
     if (isNaN(Number(value)))
       throw new Error("Valid error: not number");
 
