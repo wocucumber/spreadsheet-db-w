@@ -1,6 +1,6 @@
 {
   "name": "spreadsheet-db-w",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "You can use spreadsheets as a convenient database.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
