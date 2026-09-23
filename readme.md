@@ -37,12 +37,12 @@ const auth = new Authorication({
 ## Example
 
 ```js
-import { Authorication, Database, createSchema, number, string, boolean } from "./src/index.js";
+import { Authorication, Database, createSchema, number, string, boolean } from "spreadsheet-db-w";
+string, boolean } from "./index.js";
+import key from "./key.json" with {type: "json"};
 
 const auth = new Authorication({
-  // @ts-ignore
   private_key: key.private_key,
-  // @ts-ignore
   client_email: key.client_email
 });
 
