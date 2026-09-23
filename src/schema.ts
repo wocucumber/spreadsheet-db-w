@@ -8,6 +8,9 @@ type InferValidation<T extends ValidationObject> = ( T extends ValidationObject<
     ? (Option extends {nullable: true} ? string | NullValue : string) :
   T extends NumberValidation
     ? (Option extends {nullable: true} ? number | NullValue : number) :
+  T extends BooleanValidation
+    ? (Option extends {nullable: true} ? boolean | NullValue : boolean) :
+
 
   never : never
 );
@@ -33,7 +36,7 @@ export function createSchema<T extends Schema>(schema: T): T & {id: NumberValida
 
 export class ValidationObject<T extends {nullable?: boolean} = {nullable: false}> {
   protected _nullable: boolean;
-  private type: "string" | "number";
+  private type: "string" | "number" | "boolean";
   private key: string;
 
   constructor(key: string, type: typeof this.type) {
@@ -92,11 +95,35 @@ export class NumberValidation extends ValidationObject {
     return Number(value);
   }
 }
+export class BooleanValidation extends ValidationObject {
+  constructor(key: string) {
+    super(key, "boolean");
+  }
+  override __validate(value: string | boolean | number): boolean | null {
+    this.validateBase(value);
+
+    if (value == "" && this._nullable)
+      return null;
+
+    if (value == NULL_VALUE)
+      return null;
+
+    return typeof value == "boolean" ? value
+      : typeof value == "string" ? 
+        ((value.toLowerCase().indexOf("false") != -1 || value == "0" || value.toLocaleLowerCase().indexOf("no") != -1) ? false : true)
+      : typeof value == "number" ?
+        value == 0 ? false : true
+      : Boolean(value)
+  }
+}
 
 export function string(key: string) {
   return new StringValidation(key);
 }
 export function number(key: string) {
   return new NumberValidation(key);
+}
+export function boolean(key: string) {
+  return new BooleanValidation(key);
 }
 

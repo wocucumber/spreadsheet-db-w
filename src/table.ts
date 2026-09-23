@@ -20,7 +20,7 @@ export class Table<S extends Schema> {
     this.sheet = sheet;
     this.schema = schema;
   }
-  private parseRow(r: GoogleSpreadsheetRow) {
+  private parseRow(r: GoogleSpreadsheetRow): InferSchema<S> {
     const id = r.get("id");
     if (!id || isNaN(Number(id))) throw new Error("Row: id is not defined.");
 
@@ -37,8 +37,8 @@ export class Table<S extends Schema> {
 
     return row;
   }
-  async getRows(): Promise<Row<S>[]> {
-    const rows: Row<S>[] = [];
+  async getRows(): Promise<InferSchema<S>[]> {
+    const rows: InferSchema<S>[] = [];
 
     for (const r of await this.sheet.getRows()) {
       rows.push(this.parseRow(r));
@@ -108,9 +108,9 @@ export class Table<S extends Schema> {
   }
 
   async deleteRow(id: number): Promise<void>;
-  async deleteRow(target: S & {id: number}): Promise<void>;
+  async deleteRow(target: InferSchema<S>): Promise<void>;
 
-  async deleteRow(argument: S & {id: number} | number) {
+  async deleteRow(argument: InferSchema<S> | number) {
     const id = typeof argument == "number" ? argument : argument.id;
 
     const rows = await this.sheet.getRows();
